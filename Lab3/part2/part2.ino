@@ -19,64 +19,42 @@ void setup() {
   pinMode(redPin, OUTPUT);
   pinMode(bluePin, OUTPUT);
   pinMode(greenPin, OUTPUT);
-
   
 }
 
 
-
 void loop() {
-  // put your main code here, to run repeatedly:
 
 
   int photo_input = analogRead(photoPin);
   int scaled_input = photo_input / 4; //convert to 0-255
-
-  //Serial.println(scaled_input);
-
-//  analogWrite(bluePin, photo_input);
+  float brightness_fraction = scaled_input / 40;
 
 
   digitalWrite(trigPin, LOW);
   delayMicroseconds(2);
 
-
-
-  
-
+  //Send a pulse 
   digitalWrite(trigPin, HIGH);
   delayMicroseconds(10);
   digitalWrite(trigPin, LOW);
 
-  
+  //read the pulse in and convert units
   float duration = pulseIn(echoPin, HIGH);
   float distance = (duration / 2)*0.0344;
   distance = distance * 4;
+
+  //Cast to int and limit max distance
   int int_distance =min(distance, 255); 
 
 
-  Serial.println(int_distance);
+  //red and green gradient LED values, based on distance and photocell brightness
+  int red_output = (int_distance) * brightness_fraction;
+  int green_output = (255 - int_distance) * brightness_fraction;
 
-  // for(int i = 100; i < 150; i ++){
-  //   analogWrite(redPin, i);
-    
-  //   analogWrite(bluePin, 255 - i);
+  analogWrite(redPin, min(255, red_output));
+  analogWrite(greenPin, min(255, green_output));
 
-  //   Serial.println(i);
-  //   delay(100);
-  // }
-
-   analogWrite(redPin, int_distance);
-   analogWrite(greenPin, 255 - int_distance);
-
-  delay(1000);
+  delay(100);
 
 }
-
-// void loop(){
-//   analogWrite(greenPin, 200);
-//   analogWrite(redPin, 255);
-//   analogWrite(bluePin, 120);
-// }
-
-
