@@ -1,9 +1,5 @@
 #include <Adafruit_SSD1306.h>
 
-/* 
-   #define statements for OLED_CS, OLED_DC, OLED_RST, OLED_SI, OLED_CLK 
-   go here.
-*/
 
 int OLED_CS = 6;
 int OLED_RST = 4;
@@ -14,6 +10,7 @@ int OLED_DC = 5;
 int ENCODER_A = 9;
 int ENCODER_B = 10;
 
+//Initialize Display
 Adafruit_SSD1306 disp(128,64,OLED_SI,OLED_CLK,OLED_DC,OLED_RST,OLED_CS);
 
 void setup() {
@@ -41,14 +38,10 @@ int y_coord = 10;
 
 void loop() {
   
-
   int a_state = digitalRead(ENCODER_A);
   int b_state = digitalRead(ENCODER_B);
 
-  // Serial.print(a_state);
-  // Serial.print(", ");
-  // Serial.print(b_state);
-  // Serial.print("\n");
+  // Check if input A changed while B did not
   if(a_state == 1 && a_last == 0 && b_state == b_last){
 
     if(a_state == b_state){
@@ -59,7 +52,8 @@ void loop() {
     }
 
   }
-
+  
+  //Check if input B changed while A did not
   else if(b_state == 1 && b_last == 0 && a_state == a_last){
 
     if(a_state == b_state){
@@ -71,13 +65,13 @@ void loop() {
 
   }
 
-
+  //Update position of ball using velocities 
   float MAX_V = 20;
   float multiplier = (float)(input - 128) * MAX_V/128; 
   x_coord += multiplier * x_v;
   y_coord += multiplier * y_v;
 
-
+  //Reverse direction when colliding with wall
   if(x_coord < 0 || x_coord > 128){
     x_v *= -1;
   }
@@ -90,13 +84,8 @@ void loop() {
 
   disp.display();
   
-  
-
-
 
   a_last = a_state;
   b_last = b_state;
   
-
-
 }
