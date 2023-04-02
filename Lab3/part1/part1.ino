@@ -1,14 +1,9 @@
-#include "part1.h"
-
 
 
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
   pinMode (13, OUTPUT);
-
-  
-
   
 }
 
@@ -21,7 +16,7 @@ void loop() {
 
   Serial.println(output_val);
 
-
+  //Output blue light intensity based on input
   int outputPin = 3;
   analogWrite(outputPin, val);
 
