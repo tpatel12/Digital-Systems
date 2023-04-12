@@ -159,6 +159,9 @@ __attribute__((used)) void process_timer_interrupt()
 #define EXTRA_SPACE 37
 #define EXTRA_PAD 4
 
+process_t *list_head = NULL;
+process_t *current_process = NULL;
+
 unsigned int process_init (void (*f) (void), int n)
 {
   unsigned long stk;
@@ -192,4 +195,101 @@ unsigned int process_init (void (*f) (void), int n)
   stk = (unsigned int)stkspace + n - EXTRA_SPACE - 1;
 
   return stk;
+}
+
+
+int process_create (void (*f) (void), int n){
+
+	unsigned int new_proc = process_init(*f, n);
+
+	if(new_proc == 0){
+		return -1;
+	}
+	process_t * new_node = malloc(sizeof(process_t));
+	if(new_node == NULL){
+		return -1;
+	}
+
+	if(list_head == NULL){ //put the first and nly item in linked list
+		list_head = new_node;
+		new_node->next = new_node;
+		new_node->prev = new_node;
+	}
+	else{ //stick new node inbetween head and the one after head
+		process_t * before = list_head;
+		process_t * after = list_head->next;
+		before->next = new_node;
+		after->prev = new_node;
+		new_node->next = after;
+		new_node->prev = before;
+
+	}
+
+	new_node->sp = new_proc;
+	return 0;
+}
+
+
+void process_start (void){
+	
+	// if(list_head != NULL){
+		// current_process = NULL; //list_head->sp;
+		process_begin();
+	// }
+
+}
+
+void remove_current(){
+	if (current_process->next == current_process){
+		free(current_process);
+		list_head = NULL;
+    current_process = list_head;
+	}
+	else{
+		current_process->prev->next = current_process->next;
+		current_process->next->prev = current_process->prev;
+
+		if(list_head == current_process){
+			list_head = current_process->next;
+		}
+
+		unsigned int temp = current_process;
+		current_process = current_process->next;
+		free(temp);
+	}
+}
+
+int count = 0;
+
+unsigned int process_select (unsigned int cursp){
+  // count ++;
+  // if(count % 2 != 6){
+  //   return list_head;
+  // }
+
+  
+	if(cursp == 0){
+    //return 0;
+    if (current_process == NULL && list_head != NULL){
+      current_process = list_head;
+      return list_head->sp;
+    }
+		//either no running processes or current process is terminated
+    else{
+      remove_current(); //remove current process and update current_Process to the next item in list
+      if(current_process == NULL){
+        return 0;
+      }
+      else{
+        //current process has terminated
+        return current_process->sp;
+      }
+    }
+	}
+	//cursp != 0
+	else{ 
+    current_process = current_process->next;
+	  return current_process->sp;
+  }
+
 }

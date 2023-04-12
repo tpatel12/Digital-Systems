@@ -18,6 +18,13 @@ typedef struct process_state process_t;
       implementation.
    */
 
+struct process_state {
+   unsigned int sp; /* stack pointer */
+   struct process_state *next; /* link to next process */
+   struct process_state *prev; /* link to prev process */
+};
+
+
 
 /*------------------------------------------------------------------------
 
